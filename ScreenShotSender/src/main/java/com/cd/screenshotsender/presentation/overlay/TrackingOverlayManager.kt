@@ -184,10 +184,6 @@ internal class TrackingOverlayManager(
         this.packageName = packageName
     }
 
-    fun setRootView(view: View) {
-        rootView = view
-    }
-
     private fun temporarilyHideOverlay(callback: suspend () -> Unit) {
         coroutineScope.launch {
             try {

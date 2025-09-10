@@ -30,7 +30,6 @@ internal class FileUploadTracker {
 
     val sendScreenShotStateFlow = _sendScreenShotStateFlow.asStateFlow()
 
-
     fun sendScreenShot(context: Context, rootView: View, packageName: String) {
         if (_sendScreenShotStateFlow.value is DataUiResponseStatus.Loading) {
             return
@@ -86,7 +85,6 @@ internal class FileUploadTracker {
             }
         }
     }
-
 
     private suspend fun captureScreenshot(view: View, context: Context): File =
         withContext(Dispatchers.Main) {
