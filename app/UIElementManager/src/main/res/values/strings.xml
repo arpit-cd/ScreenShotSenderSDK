@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="elements">%1$d elements</string>
+    <string name="error">Error</string>
+    <string name="something_went_wrong_please_try_again_later">Something went wrong, please try again later</string>
+    <string name="no_internet_connection_please_make_sure_your_device_is_connected_to_an_active_internet_connection">No internet connection. Please make sure your device is connected to an active internet connection.</string>
+    <string name="dismiss">Dismiss</string>
+</resources>
