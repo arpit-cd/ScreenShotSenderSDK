@@ -43,6 +43,9 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
+    //chucker
+    debugImplementation (libs.chucker.debug)
+    releaseImplementation (libs.chucker.release)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
