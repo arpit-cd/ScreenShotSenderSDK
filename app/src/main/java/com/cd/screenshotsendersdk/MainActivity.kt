@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        ScreenShotSenderSDK.startSDK(this)
+        ScreenShotSenderSDK.startSDK(this,"deliveryapp.countrydelight.in.deliveryapp")
     }
 
     override fun onPause() {
