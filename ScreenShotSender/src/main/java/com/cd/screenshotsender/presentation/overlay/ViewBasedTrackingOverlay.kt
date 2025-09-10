@@ -91,7 +91,7 @@ internal class ViewBasedTrackingOverlay(context: Context) :
      * Show success state with checkmark icon
      */
     fun showSuccess() {
-        sendFab.setImageResource(android.R.drawable.ic_menu_upload_you_tube) // Checkmark-like icon
+        sendFab.setImageResource(android.R.drawable.checkbox_on_background)
         progressBar.visibility = GONE
         sendFab.isEnabled = true
         sendFab.backgroundTintList =
