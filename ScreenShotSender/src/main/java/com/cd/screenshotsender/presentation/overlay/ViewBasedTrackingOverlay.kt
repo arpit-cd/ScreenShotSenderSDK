@@ -56,7 +56,7 @@ internal class ViewBasedTrackingOverlay(context: Context) :
             layoutParams = LayoutParams(dpToPx(56), dpToPx(56))
             size = FloatingActionButton.SIZE_NORMAL
             elevation = dpToPx(6).toFloat()
-            setImageResource(android.R.drawable.ic_menu_send)
+            setImageResource(com.cd.screenshotsender.R.drawable.outline_upload_24)
             imageTintList = ColorStateList.valueOf(Color.WHITE)
             backgroundTintList =
                 ContextCompat.getColorStateList(context, android.R.color.holo_blue_dark)
@@ -113,7 +113,7 @@ internal class ViewBasedTrackingOverlay(context: Context) :
      * Reset FAB to normal state
      */
     fun resetToNormalState() {
-        sendFab.setImageResource(android.R.drawable.ic_menu_send)
+        sendFab.setImageResource(com.cd.screenshotsender.R.drawable.outline_upload_24)
         progressBar.visibility = GONE
         sendFab.isEnabled = true
         sendFab.backgroundTintList =
