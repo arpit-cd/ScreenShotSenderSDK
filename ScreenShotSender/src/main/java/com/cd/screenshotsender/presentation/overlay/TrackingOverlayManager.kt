@@ -22,13 +22,13 @@ import kotlinx.coroutines.launch
  */
 internal class TrackingOverlayManager(
     private val context: Context,
-    private val fileUploadTracker: FileUploadTracker,
-    private val packageName: String
+    private val fileUploadTracker: FileUploadTracker
 ) {
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var overlayView: ViewBasedTrackingOverlay? = null
     private var isOverlayShown = false
     private var rootView: View? = null
+    private lateinit var packageName: String
     private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     /**
@@ -179,9 +179,11 @@ internal class TrackingOverlayManager(
         }
     }
 
-    /**
-     * Set the root view explicitly (useful when you have access to the activity)
-     */
+
+    fun setPackageName(packageName: String) {
+        this.packageName = packageName
+    }
+
     fun setRootView(view: View) {
         rootView = view
     }

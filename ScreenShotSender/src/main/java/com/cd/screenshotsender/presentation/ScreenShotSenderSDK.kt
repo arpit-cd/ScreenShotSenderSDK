@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
-import android.view.View
 import androidx.core.net.toUri
 import com.cd.screenshotsender.presentation.service.ScreenShotSenderService
 import com.cd.screenshotsender.presentation.utils.FunctionHelper.showToast
@@ -21,14 +20,12 @@ object ScreenShotSenderSDK {
         if (isSDKRunning()) return
         try {
             val intent = Intent(activity, ScreenShotSenderService::class.java)
+            intent.putExtra("packageName", packageName ?: activity.packageName)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 activity.startForegroundService(intent)
             } else {
                 activity.startService(intent)
             }
-            val rootView = activity.findViewById<View>(android.R.id.content)
-            ScreenShotSenderService.Companion.setRootView(rootView)
-            ScreenShotSenderService.Companion.setPackageName(packageName ?: activity.packageName)
         } catch (e: Exception) {
             activity.showToast("Failed to start tracking service ${e.localizedMessage}")
         }
