@@ -91,7 +91,7 @@ internal class ScreenShotSenderService : Service() {
         }
     }
 
-    private fun createNotification(message: String = "Tracking ScreenShots..."): Notification {
+    private fun createNotification(message: String = "Tracking Screenshots..."): Notification {
         val stopIntent = Intent(this, ScreenShotSenderService::class.java).apply {
             action = ACTION_STOP_SERVICE
         }
@@ -102,9 +102,9 @@ internal class ScreenShotSenderService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("ScreenShot Sender")
+            .setContentTitle("Screenshot Sender")
             .setContentText(message)
-            .setSmallIcon(android.R.drawable.ic_menu_view) // Use a default icon
+            .setSmallIcon(android.R.drawable.ic_menu_view)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .addAction(

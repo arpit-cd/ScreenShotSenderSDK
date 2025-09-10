@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.cd.screenshotsender.presentation.ScreenShotSenderSDK
 import com.cd.screenshotsendersdk.ui.theme.ScreenShotSenderSDKTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,6 +28,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ScreenShotSenderSDK.startSDK(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        ScreenShotSenderSDK.stopSDK(this)
     }
 }
 
