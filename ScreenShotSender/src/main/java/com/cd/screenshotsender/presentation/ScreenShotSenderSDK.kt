@@ -14,7 +14,7 @@ object ScreenShotSenderSDK {
 
     private const val OVERLAY_PERMISSION_REQUEST_CODE = 1234
 
-    fun startSDK(activity: Activity) {
+    fun startSDK(activity: Activity, packageName: String? = null) {
         if (!Settings.canDrawOverlays(activity)) {
             requestOverlayPermission(activity)
         }
@@ -28,6 +28,7 @@ object ScreenShotSenderSDK {
             }
             val rootView = activity.findViewById<View>(android.R.id.content)
             ScreenShotSenderService.Companion.setRootView(rootView)
+            ScreenShotSenderService.Companion.setPackageName(packageName ?: activity.packageName)
         } catch (e: Exception) {
             activity.showToast("Failed to start tracking service ${e.localizedMessage}")
         }

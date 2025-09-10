@@ -30,6 +30,10 @@ internal class ScreenShotSenderService : Service() {
             instance?.overlayManager?.setRootView(view)
         }
 
+        internal fun setPackageName(packageName: String) {
+            instance?.packageName = packageName
+        }
+
         internal fun isServiceRunning(): Boolean {
             return instance != null
         }
@@ -39,13 +43,14 @@ internal class ScreenShotSenderService : Service() {
 
     private lateinit var fileUploadTracker: FileUploadTracker
     private lateinit var overlayManager: TrackingOverlayManager
+    private lateinit var packageName: String
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate() {
         super.onCreate()
         instance = this
         fileUploadTracker = FileUploadTracker()
-        overlayManager = TrackingOverlayManager(this, fileUploadTracker)
+        overlayManager = TrackingOverlayManager(this, fileUploadTracker, packageName)
         createNotificationChannel()
     }
 
@@ -114,6 +119,4 @@ internal class ScreenShotSenderService : Service() {
             )
             .build()
     }
-
-
 }

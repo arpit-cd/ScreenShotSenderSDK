@@ -22,7 +22,8 @@ import kotlinx.coroutines.launch
  */
 internal class TrackingOverlayManager(
     private val context: Context,
-    private val fileUploadTracker: FileUploadTracker
+    private val fileUploadTracker: FileUploadTracker,
+    private val packageName: String
 ) {
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var overlayView: ViewBasedTrackingOverlay? = null
@@ -202,7 +203,7 @@ internal class TrackingOverlayManager(
         temporarilyHideOverlay {
             val view = getRootView()
             if (view != null) {
-                fileUploadTracker.sendScreenShot(context, view)
+                fileUploadTracker.sendScreenShot(context, view, packageName)
             } else {
                 context.showToast("No view available for screenshot. Please ensure app is in foreground.")
             }

@@ -31,14 +31,13 @@ internal class FileUploadTracker {
     val sendScreenShotStateFlow = _sendScreenShotStateFlow.asStateFlow()
 
 
-    fun sendScreenShot(context: Context, rootView: View) {
+    fun sendScreenShot(context: Context, rootView: View, packageName: String) {
         if (_sendScreenShotStateFlow.value is DataUiResponseStatus.Loading) {
             return
         }
         _sendScreenShotStateFlow.value = DataUiResponseStatus.Companion.loading()
         CoroutineScope(Dispatchers.IO).launch {
             _sendScreenShotStateFlow.value = try {
-                val packageName = context.packageName
                 val sendPackageNameUseCase = SendPackageNameUseCase()
                 val response = sendPackageNameUseCase.invoke(packageName, context)
                 when (response) {
@@ -87,6 +86,7 @@ internal class FileUploadTracker {
             }
         }
     }
+
 
     private suspend fun captureScreenshot(view: View, context: Context): File =
         withContext(Dispatchers.Main) {
