@@ -72,9 +72,9 @@ internal class TrackingOverlayManager(
                 // Calculate FAB size and margins
                 val density = context.resources.displayMetrics.density
                 val fabSize = (56 * density).toInt() // FAB size
-                val padding = (8 * density).toInt() // Padding added in ViewBasedTrackingOverlay
-                val totalSize = fabSize + (padding * 2) // Total size including padding
-                val margin = (32 * density).toInt() // Margin from screen edge
+                val horizontalPadding = (2 * density).toInt() // Horizontal padding added in ViewBasedTrackingOverlay
+                val totalSize = fabSize + (horizontalPadding * 2) // Total size including horizontal padding
+                val margin = (16 * density).toInt() // Margin from screen edge
                 
                 // Position at bottom-right with proper offsets
                 x = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -83,9 +83,9 @@ internal class TrackingOverlayManager(
                     context.resources.displayMetrics.widthPixels - totalSize - margin
                 }
                 y = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    windowManager.currentWindowMetrics.bounds.height() - totalSize - margin - 100
+                    windowManager.currentWindowMetrics.bounds.height() - totalSize - margin
                 } else {
-                    context.resources.displayMetrics.heightPixels - totalSize - margin - 100
+                    context.resources.displayMetrics.heightPixels - totalSize - margin
                 }
             }
             

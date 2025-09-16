@@ -1,13 +1,17 @@
 package com.cd.screenshotsender.presentation.overlay
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Point
+import android.os.Build
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.WindowManager
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -33,6 +37,10 @@ internal class ViewBasedTrackingOverlay(context: Context) :
     private var initialTouchX = 0f
     private var initialTouchY = 0f
     private var isDragging = false
+    
+    private var snapAnimator: ValueAnimator? = null
+    private var currentX = 0
+    private var currentY = 0
 
     constructor(context: Context, onSendClicked: () -> Unit) : this(context) {
         this.onSendClicked = onSendClicked
@@ -61,7 +69,7 @@ internal class ViewBasedTrackingOverlay(context: Context) :
             gravity = Gravity.CENTER_VERTICAL
             layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
             // Add padding to increase touch target area for dragging
-            setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8))
+            setPadding(dpToPx(2), dpToPx(8), dpToPx(2), dpToPx(8))
         }
 
         val fabContainer = FrameLayout(context).apply {
@@ -150,6 +158,81 @@ internal class ViewBasedTrackingOverlay(context: Context) :
         ).toInt()
     }
     
+    /**
+     * Get screen dimensions
+     */
+    private fun getScreenSize(): Point {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val size = Point()
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val bounds = windowManager.currentWindowMetrics.bounds
+            size.x = bounds.width()
+            size.y = bounds.height()
+        } else {
+            val displayMetrics = context.resources.displayMetrics
+            size.x = displayMetrics.widthPixels
+            size.y = displayMetrics.heightPixels
+        }
+        
+        return size
+    }
+    
+    /**
+     * Snap the FAB to the nearest edge (left or right) with animation
+     */
+    private fun snapToNearestCorner() {
+        val screenSize = getScreenSize()
+        val margin = dpToPx(16) // 16dp margin on left/right edges
+        val fabTotalSize = dpToPx(56 + 4) // FAB size + horizontal padding (2dp * 2)
+        
+        // Define edge positions
+        val leftEdgeX = margin
+        val rightEdgeX = screenSize.x - fabTotalSize - margin
+        
+        // Get current position
+        val currentPosX = windowParams?.x ?: 0
+        val currentPosY = windowParams?.y ?: 0
+        
+        // Calculate distance to center of screen
+        val screenCenterX = screenSize.x / 2
+        
+        // Determine which edge is closer
+        val targetX = if (currentPosX < screenCenterX) leftEdgeX else rightEdgeX
+        
+        // Keep the current Y position (no vertical snapping)
+        val targetY = currentPosY
+        
+        // Animate to target position
+        animateToPosition(currentPosX, currentPosY, targetX, targetY)
+    }
+    
+    /**
+     * Animate FAB to target position
+     */
+    private fun animateToPosition(startX: Int, startY: Int, endX: Int, endY: Int) {
+        snapAnimator?.cancel()
+        
+        snapAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 250 // 250ms animation
+            interpolator = DecelerateInterpolator()
+            
+            addUpdateListener { animator ->
+                val progress = animator.animatedValue as Float
+                val newX = (startX + (endX - startX) * progress).toInt()
+                val newY = (startY + (endY - startY) * progress).toInt()
+                
+                currentX = newX
+                currentY = newY
+                
+                // Update position through callback
+                onPositionChanged?.invoke(newX, newY)
+            }
+            
+            start()
+        }
+    }
+    
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -203,6 +286,9 @@ internal class ViewBasedTrackingOverlay(context: Context) :
                 if (!isDragging) {
                     // If we didn't drag, perform click on the FAB
                     sendFab.performClick()
+                } else {
+                    // Snap to nearest corner after dragging
+                    snapToNearestCorner()
                 }
                 isDragging = false
                 return true
