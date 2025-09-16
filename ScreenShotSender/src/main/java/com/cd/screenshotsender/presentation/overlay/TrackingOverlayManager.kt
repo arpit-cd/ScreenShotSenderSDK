@@ -3,6 +3,7 @@ package com.cd.screenshotsender.presentation.overlay
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.Point
 import android.os.Build
 import android.view.Gravity
 import android.view.View
@@ -26,6 +27,7 @@ internal class TrackingOverlayManager(
 ) {
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var overlayView: ViewBasedTrackingOverlay? = null
+    private var overlayParams: WindowManager.LayoutParams? = null
     private var isOverlayShown = false
     private var rootView: View? = null
     private lateinit var packageName: String
@@ -45,6 +47,12 @@ internal class TrackingOverlayManager(
                     sendScreenShotToServer()
                 },
             )
+            
+            // Set position changed listener
+            trackingOverlay.setOnPositionChanged { x, y ->
+                updateOverlayPosition(x, y)
+            }
+            
             observeUploadStatus(trackingOverlay)
             val params = WindowManager.LayoutParams().apply {
                 width = WindowManager.LayoutParams.WRAP_CONTENT
@@ -55,16 +63,38 @@ internal class TrackingOverlayManager(
                     @Suppress("DEPRECATION")
                     WindowManager.LayoutParams.TYPE_PHONE
                 }
-                flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                 format = PixelFormat.TRANSLUCENT
-                gravity = Gravity.BOTTOM or Gravity.END
-                x = 32
-                y = 100
+                gravity = Gravity.TOP or Gravity.START
+                
+                // Calculate FAB size and margins
+                val density = context.resources.displayMetrics.density
+                val fabSize = (56 * density).toInt() // FAB size
+                val padding = (8 * density).toInt() // Padding added in ViewBasedTrackingOverlay
+                val totalSize = fabSize + (padding * 2) // Total size including padding
+                val margin = (32 * density).toInt() // Margin from screen edge
+                
+                // Position at bottom-right with proper offsets
+                x = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    windowManager.currentWindowMetrics.bounds.width() - totalSize - margin
+                } else {
+                    context.resources.displayMetrics.widthPixels - totalSize - margin
+                }
+                y = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    windowManager.currentWindowMetrics.bounds.height() - totalSize - margin - 100
+                } else {
+                    context.resources.displayMetrics.heightPixels - totalSize - margin - 100
+                }
             }
+            
+            // Set the window params reference in the overlay
+            trackingOverlay.windowParams = params
+            
             windowManager.addView(trackingOverlay, params)
             overlayView = trackingOverlay
+            overlayParams = params
             isOverlayShown = true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -204,6 +234,47 @@ internal class TrackingOverlayManager(
                 fileUploadTracker.sendScreenShot(context, view, packageName)
             } else {
                 context.showToast("No view available for screenshot. Please ensure app is in foreground.")
+            }
+        }
+    }
+    
+    /**
+     * Update the overlay position when dragged
+     */
+    private fun updateOverlayPosition(x: Int, y: Int) {
+        overlayParams?.let { params ->
+            overlayView?.let { view ->
+                // Get screen dimensions
+                val screenWidth: Int
+                val screenHeight: Int
+                
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    val windowMetrics = windowManager.currentWindowMetrics
+                    val bounds = windowMetrics.bounds
+                    screenWidth = bounds.width()
+                    screenHeight = bounds.height()
+                } else {
+                    val displayMetrics = context.resources.displayMetrics
+                    screenWidth = displayMetrics.widthPixels
+                    screenHeight = displayMetrics.heightPixels
+                }
+                
+                // Calculate FAB dimensions (approximate)
+                val fabSize = (56 * context.resources.displayMetrics.density).toInt()
+                val margin = (16 * context.resources.displayMetrics.density).toInt()
+                
+                // Calculate boundaries
+                val maxX = screenWidth - fabSize - margin
+                val maxY = screenHeight - fabSize - margin
+                
+                // Constrain position within bounds
+                params.x = x.coerceIn(margin, maxX)
+                params.y = y.coerceIn(margin, maxY)
+                
+                // Update the params reference in the overlay view
+                view.windowParams = params
+                
+                windowManager.updateViewLayout(view, params)
             }
         }
     }
