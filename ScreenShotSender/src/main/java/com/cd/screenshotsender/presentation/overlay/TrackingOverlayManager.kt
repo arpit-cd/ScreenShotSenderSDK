@@ -3,7 +3,6 @@ package com.cd.screenshotsender.presentation.overlay
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PixelFormat
-import android.graphics.Point
 import android.os.Build
 import android.view.Gravity
 import android.view.View
@@ -47,12 +46,12 @@ internal class TrackingOverlayManager(
                     sendScreenShotToServer()
                 },
             )
-            
+
             // Set position changed listener
             trackingOverlay.setOnPositionChanged { x, y ->
                 updateOverlayPosition(x, y)
             }
-            
+
             observeUploadStatus(trackingOverlay)
             val params = WindowManager.LayoutParams().apply {
                 width = WindowManager.LayoutParams.WRAP_CONTENT
@@ -68,14 +67,16 @@ internal class TrackingOverlayManager(
                         WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                 format = PixelFormat.TRANSLUCENT
                 gravity = Gravity.TOP or Gravity.START
-                
+
                 // Calculate FAB size and margins
                 val density = context.resources.displayMetrics.density
                 val fabSize = (56 * density).toInt() // FAB size
-                val horizontalPadding = (2 * density).toInt() // Horizontal padding added in ViewBasedTrackingOverlay
-                val totalSize = fabSize + (horizontalPadding * 2) // Total size including horizontal padding
+                val horizontalPadding =
+                    (2 * density).toInt() // Horizontal padding added in ViewBasedTrackingOverlay
+                val totalSize =
+                    fabSize + (horizontalPadding * 2) // Total size including horizontal padding
                 val margin = (16 * density).toInt() // Margin from screen edge
-                
+
                 // Position at bottom-right with proper offsets
                 x = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     windowManager.currentWindowMetrics.bounds.width() - totalSize - margin
@@ -88,10 +89,10 @@ internal class TrackingOverlayManager(
                     context.resources.displayMetrics.heightPixels - totalSize - margin
                 }
             }
-            
+
             // Set the window params reference in the overlay
             trackingOverlay.windowParams = params
-            
+
             windowManager.addView(trackingOverlay, params)
             overlayView = trackingOverlay
             overlayParams = params
@@ -237,7 +238,7 @@ internal class TrackingOverlayManager(
             }
         }
     }
-    
+
     /**
      * Update the overlay position when dragged
      */
@@ -247,7 +248,7 @@ internal class TrackingOverlayManager(
                 // Get screen dimensions
                 val screenWidth: Int
                 val screenHeight: Int
-                
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     val windowMetrics = windowManager.currentWindowMetrics
                     val bounds = windowMetrics.bounds
@@ -258,22 +259,22 @@ internal class TrackingOverlayManager(
                     screenWidth = displayMetrics.widthPixels
                     screenHeight = displayMetrics.heightPixels
                 }
-                
+
                 // Calculate FAB dimensions (approximate)
                 val fabSize = (56 * context.resources.displayMetrics.density).toInt()
                 val margin = (16 * context.resources.displayMetrics.density).toInt()
-                
+
                 // Calculate boundaries
                 val maxX = screenWidth - fabSize - margin
                 val maxY = screenHeight - fabSize - margin
-                
+
                 // Constrain position within bounds
                 params.x = x.coerceIn(margin, maxX)
                 params.y = y.coerceIn(margin, maxY)
-                
+
                 // Update the params reference in the overlay view
                 view.windowParams = params
-                
+
                 windowManager.updateViewLayout(view, params)
             }
         }
