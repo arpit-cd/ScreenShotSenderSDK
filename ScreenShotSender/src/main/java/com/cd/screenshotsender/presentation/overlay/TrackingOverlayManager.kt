@@ -63,6 +63,7 @@ internal class TrackingOverlayManager(
                     WindowManager.LayoutParams.TYPE_PHONE
                 }
                 flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                         WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
                         WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                 format = PixelFormat.TRANSLUCENT
