@@ -1,6 +1,6 @@
 # ScreenShotSenderSDK
 
-[![](https://jitpack.io/v/arpit-cd/ScreenShotSenderSDK.svg)](https://jitpack.io/#arpit-cd/ScreenShotSenderSDK)
+[![](https://jitpack.io/v/cdcountrydelight/ScreenShotSenderSDK.svg)](https://jitpack.io/#cdcountrydelight/ScreenShotSenderSDK)
 [![Android](https://img.shields.io/badge/Android-API%2024%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.2.10-blue.svg?style=flat)](https://kotlinlang.org)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
@@ -33,11 +33,11 @@ Add JitPack repository to your project's `settings.gradle.kts`:
 
 ```kotlin
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        mavenCentral()
-        maven { url = uri("https://jitpack.io") }
-    }
+   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+   repositories {
+      mavenCentral()
+      maven { url = uri("https://jitpack.io") }
+   }
 }
 ```
 
@@ -47,7 +47,7 @@ Add the dependency to your module's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.arpit-cd:ScreenShotSenderSDK:Tag")
+   implementation("com.github.cdcountrydelight:ScreenShotSenderSDK:Tag")
 }
 ```
 
@@ -63,24 +63,62 @@ Replace `Tag` with the latest version number from the JitPack badge above.
 import com.cd.screenshotsender.presentation.ScreenShotSenderSDK
 
 class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
-        // Start the SDK with default package name
-        ScreenShotSenderSDK.startSDK(this)
-        
-        // Or start with custom package name
-        ScreenShotSenderSDK.startSDK(this, "com.example.myapp")
-    }
+   override fun onCreate(savedInstanceState: Bundle?) {
+      super.onCreate(savedInstanceState)
+
+      // Start the SDK with default package name
+      ScreenShotSenderSDK.startSDK(this)
+
+      // Or start with custom package name
+      ScreenShotSenderSDK.startSDK(this, "com.example.myapp")
+   }
 }
+```
+
+### Important: Async Image Loading Configuration
+
+If you're using async image loading libraries like Coil in your project, you must disable hardware acceleration to ensure screenshots can be captured properly. Hardware-accelerated bitmaps cannot be read for screenshot capture.
+
+**Example with Coil:**
+
+```kotlin
+import coil.Coil
+import coil.ImageLoader
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import android.graphics.Bitmap
+import android.os.Build
+
+// Configure Coil to disable hardware bitmaps
+val customImageLoader = ImageLoader.Builder(this)
+   .bitmapConfig(Bitmap.Config.ARGB_8888) // ✅ Disables hardware bitmaps
+   .allowHardware(false) // ✅ Disable hardware acceleration
+   .components {
+      // Add GIF/WebP support if needed
+      if (Build.VERSION.SDK_INT >= 28) {
+         add(ImageDecoderDecoder.Factory())
+      } else {
+         add(GifDecoder.Factory())
+      }
+   }
+   .build()
+
+// Set the custom ImageLoader as the default for Coil
+Coil.setImageLoader(customImageLoader)
+```
+
+**Note:** You can conditionally disable hardware acceleration only when the SDK is active:
+
+```kotlin
+.allowHardware(!ScreenShotSenderSDK.isSDKRunning())
 ```
 
 2. **Stop the SDK when needed:**
 
 ```kotlin
 override fun onDestroy() {
-    super.onDestroy()
-    ScreenShotSenderSDK.stopSDK(this)
+   super.onDestroy()
+   ScreenShotSenderSDK.stopSDK(this)
 }
 ```
 
@@ -88,7 +126,7 @@ override fun onDestroy() {
 
 ```kotlin
 if (ScreenShotSenderSDK.isSDKRunning()) {
-    // SDK is active
+   // SDK is active
 }
 ```
 
@@ -105,14 +143,14 @@ If you want to handle the permission result:
 
 ```kotlin
 override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-    if (requestCode == 1234) { // OVERLAY_PERMISSION_REQUEST_CODE
-        if (Settings.canDrawOverlays(this)) {
-            // Permission granted, SDK will start automatically
-        } else {
-            // Permission denied
-        }
-    }
+   super.onActivityResult(requestCode, resultCode, data)
+   if (requestCode == 1234) { // OVERLAY_PERMISSION_REQUEST_CODE
+      if (Settings.canDrawOverlays(this)) {
+         // Permission granted, SDK will start automatically
+      } else {
+         // Permission denied
+      }
+   }
 }
 ```
 
@@ -185,4 +223,4 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## Support
 
-For issues, feature requests, or questions, please [create an issue](https://github.com/arpit-cd/ScreenShotSenderSDK/issues) on GitHub.
+For issues, feature requests, or questions, please [create an issue](https://github.com/cdcountrydelight/ScreenShotSenderSDK/issues) on GitHub.

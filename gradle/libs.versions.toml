@@ -41,7 +41,7 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 chucker-debug = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
 chucker-release = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
-screenshotsendersdk = { module = "com.github.arpit-cd:ScreenShotSenderSDK", version.ref = "screenshotsendersdk" }
+screenshotsendersdk = { module = "com.github.cdcountrydelight:ScreenShotSenderSDK", version.ref = "screenshotsendersdk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
