@@ -42,7 +42,8 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
-    implementation(project("::ScreenShotSender"))
+//    implementation(project("::ScreenShotSender"))
+    implementation(libs.screenshotsendersdk)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
